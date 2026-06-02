@@ -53,3 +53,6 @@ setopt share_history
 # Load all ssh keys
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519 &> /dev/null
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_mm &> /dev/null
+
+# Claude Code installed to local bin
+export PATH="$HOME/.local/bin:$PATH"
