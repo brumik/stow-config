@@ -35,3 +35,11 @@ Before acting, call `dock_help()` plus the topic for the area you're touching
 - **Empty DB / first run:** `dock_db_status()` → `dock_seed(service='all')` if empty.
 - **Health:** `dock_doctor()` (environment), `dock_status(service)` (overmind processes),
   `dock_logs(service, process)` for errors.
+
+## Environment broke mid-task?
+
+If the environment itself breaks while you're doing something else (build failure, lock
+file out of sync, container unhealthy, DB not seeded, dead overmind process, or an
+`mcp__dock__*` tool returning an infra error) — **don't debug it inline.** Use the
+**`repairing-dock-environment`** skill: it delegates the repair to a fresh-context
+subagent so your task context stays clean, then summarizes every fix for the user.
