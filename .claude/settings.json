@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "deny": [
+    "allow": [
       "Bash(git commit:*)",
       "Bash(git commit)"
     ]
@@ -9,6 +9,7 @@
     "playwright@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
   },
-  "effortLevel": "xhigh",
-  "theme": "auto"
+  "effortLevel": "high",
+  "theme": "auto",
+  "skipWorkflowUsageWarning": true
 }

@@ -1,4 +1,3 @@
-source $HOME/Documents/klara-qa-dock/opencode-alias.sh
 alias dc="docker compose"
 alias t="tmux new-session -A -s main"
 alias sa='source ~/.zshrc;echo "ZSH aliases sourced."'
