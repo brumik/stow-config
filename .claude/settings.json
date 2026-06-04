@@ -7,9 +7,10 @@
   },
   "enabledPlugins": {
     "playwright@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
-  "theme": "auto",
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "theme": "auto"
 }
