@@ -12,5 +12,10 @@
   },
   "effortLevel": "high",
   "skipWorkflowUsageWarning": true,
-  "theme": "auto"
+  "theme": "auto",
+  "deniedMcpServers": [
+    {
+      "serverName": "claude_design"
+    }
+  ]
 }
