@@ -5,17 +5,18 @@
       "Bash(git commit)"
     ]
   },
-  "enabledPlugins": {
-    "playwright@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true
-  },
-  "effortLevel": "high",
-  "skipWorkflowUsageWarning": true,
-  "theme": "auto",
+  "model": "opus[1m]",
   "deniedMcpServers": [
     {
       "serverName": "claude_design"
     }
-  ]
+  ],
+  "enabledPlugins": {
+    "playwright@claude-plugins-official": false,
+    "superpowers@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "xhigh",
+  "skipWorkflowUsageWarning": true,
+  "theme": "auto"
 }
