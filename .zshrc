@@ -2,6 +2,8 @@ alias dc="docker compose"
 alias t="tmux new-session -A -s main"
 alias sa='source ~/.zshrc;echo "ZSH aliases sourced."'
 alias e="exit"
+alias co="claude --model opus"
+alias tilt='/opt/homebrew/bin/tilt'
 
 
 # git
