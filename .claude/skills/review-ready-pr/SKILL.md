@@ -34,9 +34,18 @@ Two metadata lines, then two fixed subsections. Nothing else.
 
 ## Clarifications
 
-<Bullets for anything NOT obvious from the diff: non-local consequences, why a version was
-chosen, a source/registry switch, an API migration's gotchas, why something needed NO change,
-CI/workflow tweaks, in-container lock regen, etc.>
+<Bullets for code-level facts the reviewer can't infer from the diff itself — each one points
+at the code and explains a *decision*, not the story of how you worked. Good candidates: a
+non-obvious workaround and why it was necessary; why one implementation was chosen over the
+obvious alternative; a non-local consequence of a change; why a seemingly-unrelated file had to
+change; why a specific version was picked; why something needed NO change; an API migration's
+gotcha.
+
+NOT process or history: how you regenerated a lockfile, which merge conflicts you resolved and
+how, local-environment struggles, "I rebased then …". The reviewer reviews the resulting code,
+not your workflow — that narration is noise here. If a process step changes what to *trust* in
+the diff (e.g. a lockfile was regenerated in-container, a test can't run locally), state the
+*outcome* under **Tested with**, not the play-by-play here.>
 
 ## Tested with
 
@@ -49,6 +58,11 @@ Rules that matter (these are the corrections the convention was tuned on):
 
 - **No summary paragraph or change/diff table between the metadata and Clarifications.** If the
   diff makes it clear, it doesn't belong in the body.
+- **Clarifications are about the code, not the process.** Each bullet should help someone
+  *reading the diff* — a non-obvious workaround, a decision, a non-local effect. The story of
+  how you got there (rebases, conflict resolution, lockfile regen dances, env fights) is not a
+  clarification; drop it or, if it changes what to trust in the diff, fold the outcome into
+  **Tested with**.
 - **`PRs:` lists only actually-opened PRs** — just the links, no per-PR explanation. Drop it
   entirely if there are none. Non-PR companion changes (a tweak in another repo, a local-only
   dependency) don't belong in the body at all.

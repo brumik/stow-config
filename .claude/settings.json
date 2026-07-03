@@ -5,7 +5,6 @@
       "Bash(git commit)"
     ]
   },
-  "model": "opus[1m]",
   "deniedMcpServers": [
     {
       "serverName": "claude_design"
@@ -16,7 +15,7 @@
     "superpowers@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "skipWorkflowUsageWarning": true,
   "theme": "auto"
 }
