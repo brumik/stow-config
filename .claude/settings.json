@@ -3,48 +3,38 @@
     "commit": "",
     "pr": ""
   },
-  "deniedMcpServers": [
-    {
-      "serverName": "claude_design"
-    }
-  ],
-  "effortLevel": "high",
-  "enabledPlugins": {
-    "datadog@claude-plugins-official": true,
-    "klara-dev-harness@klara-dev-harness": false,
-    "playwright@claude-plugins-official": false,
-    "ruby-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "klara-dev-harness": {
-      "source": {
-        "path": "/Users/levente.berky/Documents/klara-dev-harness",
-        "source": "directory"
-      }
-    }
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "bash '/Users/levente.berky/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": "*"
-      }
-    ]
-  },
-  "model": "opus[1m]",
   "permissions": {
     "allow": [
       "Bash(git commit:*)",
       "Bash(git commit)"
     ]
   },
+  "model": "opus[1m]",
+  "deniedMcpServers": [
+    {
+      "serverName": "claude_design"
+    }
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/levente.berky/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "datadog@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": false
+  },
+  "effortLevel": "high",
   "skipWorkflowUsageWarning": true,
   "theme": "auto"
 }
