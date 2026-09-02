@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# herdr-native project picker, replacing `tms` (tmux-sessionizer), which could
+# only ever create tmux sessions. Fuzzy-pick a git repo, then focus its
+# workspace if one is open, or create one rooted there.
+#
+# Search paths mirror ~/.config/tms/config.toml: ~/Documents depth 2, ~ depth 1.
+# A repo at depth N has its .git at find-depth N+1, hence the maxdepth values.
+
+set -uo pipefail
+
+die() {
+	printf 'herdr-sessionizer: %s\n\nPress any key to close...' "$*" >&2
+	read -r -n 1 -s 2>/dev/null || true
+	exit 1
+}
+
+command -v herdr >/dev/null || die "herdr not on PATH"
+command -v fzf >/dev/null || die "fzf not on PATH"
+command -v jq >/dev/null || die "jq not on PATH"
+
+# find exits nonzero on unreadable dirs; swallow that or pipefail sinks the
+# whole pipeline and the selection is discarded.
+list_repos() {
+	find "$HOME/Documents" -mindepth 2 -maxdepth 3 -type d -name .git -prune -exec dirname {} \; 2>/dev/null || true
+	find "$HOME" -mindepth 2 -maxdepth 2 -type d -name .git -prune -exec dirname {} \; 2>/dev/null || true
+	return 0
+}
+
+selection=$(list_repos | sort -u | sed "s|^$HOME/|~/|" | fzf --prompt='project> ')
+rc=$?
+
+# 130 = cancelled with Esc/Ctrl-C.
+[ "$rc" -eq 0 ] && [ -n "$selection" ] || exit 0
+
+dir="${selection/#\~\//$HOME/}"
+label=$(basename "$dir")
+[ -d "$dir" ] || die "not a directory: $dir"
+
+# workspace list exposes no cwd, so an open workspace can only be matched by
+# label, which is the basename we set on creation.
+list_json=$(herdr workspace list 2>&1) || die "workspace list failed: $list_json"
+existing=$(printf '%s' "$list_json" |
+	jq -r --arg l "$label" 'first(.result.workspaces[] | select(.label == $l) | .workspace_id) // empty')
+
+if [ -n "$existing" ]; then
+	out=$(herdr workspace focus "$existing" 2>&1) || die "workspace focus failed: $out"
+else
+	out=$(herdr workspace create --cwd "$dir" --label "$label" --focus 2>&1) || die "workspace create failed: $out"
+fi

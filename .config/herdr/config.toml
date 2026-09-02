@@ -1,0 +1,38 @@
+onboarding = false
+[keys]
+prefix = "ctrl+a"
+
+# Pane navigation — matches tmux's `bind h/j/k/l -> select-pane -L/-D/-U/-R`.
+# These are herdr's own v0.7.5 defaults; spelled out explicitly so they don't
+# silently drift if a future herdr version changes its defaults.
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# Project picker, replacing the tmux `tms` popup bindings. `tms` only creates
+# tmux sessions, so it opened a nested tmux client inside herdr; this script
+# uses herdr's own `workspace create/focus` instead. Same search paths as
+# ~/.config/tms/config.toml.
+# Switching between already-open workspaces is built in: prefix+w (picker),
+# prefix+g (searchable workspace/tab/pane tree).
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = "~/.local/bin/herdr-sessionizer"
+description = "project picker"
+width = "80%"
+height = "80%"
+
+[ui]
+show_agent_labels_on_pane_borders = true
+
+[ui.toast]
+delivery = "system"
+
+[experimental]
+pane_history = false
+
+[theme]
+name = "nord"
+auto_switch = false

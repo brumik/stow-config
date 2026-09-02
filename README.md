@@ -12,7 +12,9 @@ macOS dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 - **Git** - Global git config with diffnav
 - **SSH** - SSH client config
 - **gh-dash** - GitHub CLI dashboard
-- **tms** - tmux-sessionizer project picker
+- **tms** - tmux-sessionizer project picker (tmux only)
+- **herdr** - terminal multiplexer for AI coding agents, with a tmux-matched
+  keymap and a native project picker (`.local/bin/herdr-sessionizer`)
 - **Claude Code** - `~/.claude/settings.json` and a stow-managed `~/.claude/skills/` directory
 
 ## Initial Setup
@@ -62,6 +64,27 @@ stow -d ~/Documents -t ~ stow-config
    stow -R -d ~/Documents -t ~ stow-config
    ```
 3. Commit and push.
+
+## herdr
+
+`~/.config/herdr/config.toml` is stow-managed; the rest of `~/.config/herdr`
+(sockets, logs, `session.json`, `.plugins.lock`) is machine-local runtime state
+and is deliberately not version-controlled — the same split used for `~/.claude`.
+
+The keymap mirrors the tmux config so muscle memory carries over: prefix is
+`ctrl+a`, and `prefix+h/j/k/l` moves pane focus.
+
+Session switching splits in two, unlike tmux where `tms` did both:
+
+- **Already-open workspaces** — built in, no config needed: `prefix+w` (picker)
+  and `prefix+g` (searchable workspace/tab/pane tree).
+- **Opening a project from disk** — `prefix+t` runs `.local/bin/herdr-sessionizer`,
+  which fuzzy-picks a git repo and focuses its workspace or creates one via
+  `herdr workspace create --cwd`. It searches the same paths as
+  `.config/tms/config.toml` (`~/Documents` depth 2, `~` depth 1).
+
+`tms` itself is **not** usable from herdr: it shells out to `tmux`, so it can only
+ever produce tmux sessions. It stays configured here for the tmux setup only.
 
 ## Claude Code
 
