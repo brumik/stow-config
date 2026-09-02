@@ -16,6 +16,8 @@ macOS dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 - **herdr** - terminal multiplexer for AI coding agents, with a tmux-matched
   keymap and a native project picker (`.local/bin/herdr-sessionizer`)
 - **Claude Code** - `~/.claude/settings.json` and a stow-managed `~/.claude/skills/` directory
+- **Atlassian MCP** - launchd agent that auto-starts a local Jira/Confluence MCP
+  container (`atlassian-mcp/`)
 
 ## Initial Setup
 
@@ -142,7 +144,27 @@ Currently enabled:
 > stow-managed (it carries per-project state), so those two are **not** reproducible from
 > this repo — re-add them on a new machine with
 > `claude mcp add --transport http <name> <url>`. Playwright avoids that gap by being a
-> plugin (enablement captured above).
+> plugin (enablement captured above). `atlassian` is a third case, handled below.
+
+## Atlassian MCP (Jira + Confluence)
+
+The `atlassian` MCP server used to point at the dock stack's `atlassian-mcp.modmed.dev`
+(Traefik + Docker Compose, only reachable when the whole `klara-qa-dock` stack is up).
+It's now a standalone container, always running locally, independent of dock:
+
+- **`atlassian-mcp/com.levente.atlassian-mcp.plist`** — a launchd agent that starts
+  Docker Desktop if it isn't running, waits for the daemon, then runs
+  `ghcr.io/sooperset/mcp-atlassian` directly with `docker run` (no compose file, no
+  Traefik) on `127.0.0.1:9000`. Like `com.levente.playwright-mcp.plist`, the whole
+  command is inlined in the plist rather than calling a script in this repo, since
+  launchd has no TCC access to `~/Documents`.
+- **`atlassian-mcp/install.sh`** — copies the plist to `~/Library/LaunchAgents` and
+  (re)loads it via `launchctl`. Re-run after editing the plist.
+- `~/.claude.json` → `mcpServers.atlassian.url` is `http://localhost:9000/mcp`.
+
+Non-secret config (Jira/Confluence URLs, usernames) is hardcoded in the plist.
+`JIRA_API_TOKEN` / `CONFLUENCE_API_TOKEN` are secrets and come from `~/.zprofile`
+instead (see `.zprofile.sample`) — the launchd agent sources it at start.
 
 ## Migrating From the Old Config Repo
 

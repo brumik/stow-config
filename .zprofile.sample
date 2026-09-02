@@ -1,0 +1,19 @@
+# Sample ~/.zprofile secrets block.
+#
+# ~/.zprofile itself is NOT stow-managed (it's a real, untracked file in $HOME,
+# never committed). This sample just documents which exports it needs to carry
+# so the rest of this repo's tooling (atlassian-mcp/, gh CLI) works.
+#
+# Copy the lines below into your real ~/.zprofile and fill in real values.
+
+# GitHub personal access token, used by `gh` and by klara-qa-dock (web-clients /
+# patient-frontend package pulls). Create at https://github.com/settings/tokens
+export GH_TOKEN=
+export GITHUB_TOKEN=$GH_TOKEN
+
+# Atlassian (Jira + Confluence) personal API token, used by the standalone
+# atlassian-mcp launchd agent (see atlassian-mcp/). Create one token at
+# https://id.atlassian.com/manage-profile/security/api-tokens and paste the
+# SAME value into both — one token authenticates both Jira and Confluence.
+export JIRA_API_TOKEN=
+export CONFLUENCE_API_TOKEN=

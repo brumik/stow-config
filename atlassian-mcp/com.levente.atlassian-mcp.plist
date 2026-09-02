@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.levente.atlassian-mcp</string>
+
+    <!-- Command is inlined here (not a script in ~/Documents) because launchd
+         agents run without TCC access to ~/Documents, and this repo lives at
+         ~/Documents/stow-config — same constraint documented in
+         com.levente.playwright-mcp.plist. ~/.zprofile is a real file directly
+         under $HOME, so sourcing it from here is fine.
+
+         Starts Docker Desktop if it isn't running, waits for the daemon, then
+         runs the Atlassian (Jira + Confluence) MCP server directly via
+         `docker run` — no compose file, no Traefik. Runs in the foreground
+         (exec + --rm) so launchd supervises the real container process and
+         KeepAlive restarts it cleanly if it ever exits. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>
+set -e
+export PATH=/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin
+
+if ! docker info >/dev/null 2>&1; then
+    open -a Docker
+    for i in $(seq 1 60); do
+        docker info >/dev/null 2>&1 && break
+        sleep 2
+    done
+fi
+
+source "$HOME/.zprofile"
+
+docker rm -f atlassian-mcp-local >/dev/null 2>&1 || true
+
+exec docker run --rm --name atlassian-mcp-local \
+    -p 127.0.0.1:9000:9000 \
+    -e TRANSPORT=streamable-http \
+    -e PORT=9000 \
+    -e HOST=0.0.0.0 \
+    -e TOOLSETS=all \
+    -e JIRA_URL=https://modmedrnd.atlassian.net \
+    -e JIRA_USERNAME=levente.berky@modmed.com \
+    -e JIRA_API_TOKEN \
+    -e CONFLUENCE_URL=https://modmedwiki.atlassian.net/wiki \
+    -e CONFLUENCE_USERNAME=levente.berky@modmed.com \
+    -e CONFLUENCE_API_TOKEN \
+    ghcr.io/sooperset/mcp-atlassian:latest
+        </string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/levente.berky/.claude/logs/atlassian-mcp.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/levente.berky/.claude/logs/atlassian-mcp.err.log</string>
+</dict>
+</plist>
