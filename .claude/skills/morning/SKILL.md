@@ -79,6 +79,16 @@ echo '<tool result json>' | bash ~/.claude/skills/morning/scripts/format-jira.sh
 
 Outputs one markdown link bullet per issue, or `NONE`.
 
+**Don't retype the tool result inline in the `echo` command.** Copying multi-line JSON by
+hand into a quoted shell string is exactly how this breaks — a real newline lands inside
+what has to be a JSON-encoded string, and `jq` fails on the unescaped control character.
+Instead, write the tool result byte-for-byte to a temp file with the Write tool, then feed
+the script from that file:
+
+```bash
+bash ~/.claude/skills/morning/scripts/format-jira.sh < /tmp/jira_assigned.json
+```
+
 ## 5. Jira — mentions
 
 ```
@@ -96,3 +106,9 @@ concept — without the cap this would keep re-surfacing the same old mentions e
 One message, five headed sections in this order (Scratchpad / GitHub: Actionable / GitHub:
 Blocked on You / Jira: Assigned / Jira: Mentions). Omit a section entirely when it's empty
 — `NONE` from a script, or nothing in the pad. Don't print "none found" noise.
+
+**Number every item with one running sequence across the whole message** — item 1 is the
+first bullet of the first non-empty section, and numbering keeps climbing across section
+boundaries without resetting. This is so the user can point at anything ("start 3", "move 5
+to code review") by number alone instead of repeating text back. Don't number section
+headers, only the individual bullets underneath them.
