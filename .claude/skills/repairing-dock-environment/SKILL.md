@@ -19,6 +19,15 @@ user at the end.** Always — even when the fix looks like one command.
 **REQUIRED BACKGROUND:** the `dock` skill (how to drive `mcp__dock__*`; `dock_help` is the
 live source of truth; mutating ops are async). **Related:** `superpowers:dispatching-parallel-agents`.
 
+**Dock is disposable, not prod.** It's a personal, per-developer environment.
+`dock_reload` is non-destructive and cheap — reach for it freely, starting with a rebuild
+before deeper diagnosis. `dock_seed` wipes the target DB, which is fine unless someone has
+manually curated test data worth keeping — flag it in your report either way. The real
+anti-pattern is hand-patching data via `dock_shell`/`dock_psql` as a workaround: the patch
+vanishes on the next rebuild and helps no one else. If a fix keeps needing to be reapplied,
+that's a signal to fix the seed script/migration/Dockerfile instead of patching around it —
+see `dock_help(topic='debugging')` for the full guidance and current symptom→fix list.
+
 ## Is this actually an environment break? (don't offload real debugging)
 
 | Delegate to a repair subagent (ENVIRONMENT) | Handle it yourself (YOUR CODE) |
@@ -60,11 +69,16 @@ What failed (verbatim):
   <exact error output>
 
 How to work:
-- Use the `dock` skill and dock_help(topic=...) as the source of truth. Read service/
-  process names from the tool enums — never guess.
-- Diagnose with read-only tools first: dock_doctor(), dock_status(service),
-  dock_logs(service, process), dock_db_status().
-- Apply the least-destructive fix (see the runbook). Mutating ops are async — poll
+- Use the `dock` skill and dock_help(topic=...) as the source of truth — it's the living
+  doc, kept current in the Dock MCP itself. Read service/process names from the tool
+  enums — never guess. Call dock_help(topic='debugging') for the current rebuild-first
+  heuristic and symptom→fix list; don't rely on a stale copy from memory.
+- Try the obvious fix first: usually `dock_reload(service)` (match `<service>-test` if the
+  failure came from dock_test), or `dock_lock_update(service)` → `dock_reload(service)` for
+  a lock-file error. It's non-destructive and clears most cases cheaply.
+- If that doesn't resolve it, diagnose with read-only tools: dock_doctor(),
+  dock_status(service), dock_logs(service, process), dock_db_status() — then apply the
+  targeted fix from dock_help(topic='debugging'). Mutating ops are async — poll
   dock_job_status(job_id=...) until done; a job is fixed only when returncode == 0.
 - VERIFY before claiming success: confirm the ENVIRONMENT is healthy again with the
   cheapest sufficient check — the build now completes, dock_status is green, or
@@ -73,9 +87,14 @@ How to work:
 
 Hard constraints:
 - DO NOT run dock_stop, `just stop-and-clean`, or anything that removes volumes/wipes
-  data. If you believe a destructive reset is the only fix, STOP and report that instead.
-- dock_seed RESETS a database (drops + reseeds) — only seed when the DB is genuinely
-  empty or a migration requires it, and call it out in your report.
+  ALL data. If you believe a full destructive reset is the only fix, STOP and report that
+  instead — this is different from a normal single-service `dock_seed`.
+- `dock_seed` resets one service's DB and is a normal, expected fix (not a last resort) —
+  use it whenever the runbook calls for it. Always call it out in your report so whoever
+  resumes knows their data changed, but don't withhold it out of excess caution.
+- Do NOT paper over a problem by hand-patching rows/config via `dock_shell`/`dock_psql`
+  instead of using the real fix (reload/reseed/lock-update). A hand-patch vanishes on the
+  next rebuild and isn't a repair — it's technical debt with your name missing from it.
 
 Return ONLY this summary (no preamble):
 - What broke (symptom + your diagnosis of the root cause)
@@ -85,23 +104,19 @@ Return ONLY this summary (no preamble):
 - Needs user attention (destructive action required, ambiguous cause, or "none")
 ```
 
-## Symptom → fix runbook (give this context to the subagent)
+## Symptom → fix guidance
 
-| Symptom | First check | Fix |
-|---|---|---|
-| "lock file out of sync" (Gemfile.lock / package-lock / go.sum) | build error text | `dock_lock_update(service)` → `dock_reload(service)` (or `<service>-test`) |
-| Build fails (bundle/npm/go) | `dock_logs(service)`, job output | check `.env` `GITHUB_TOKEN`/`ROOT_DIR` → `dock_lock_update` → `dock_reload` |
-| DB not seeded / "database not found" / empty | `dock_db_status()` | `dock_seed(service)` or `dock_seed('all')` |
-| `ActiveRecord::PendingMigrationError` (schema you didn't change) | rails logs | `dock_reload(service)`, then `dock_seed(service)` |
-| Container unhealthy / won't start | `dock_status(service)`, `dock_logs(service)` | `dock_reload(service)`; if a dependency isn't ready, wait and re-check |
-| Overmind process dead (rails/sidekiq/consumers) | `dock_status(service)` | `dock_restart(service, process)` |
-| Missing prerequisite (.env, repo, brew tool) | `dock_doctor()` | follow its recommendations |
-| Tests can't find the `*-test` container | — | `dock_reload(service + '-test')` then retry |
-| Catastrophic / corrupt volumes | — | **STOP — ask the user** before any `stop-and-clean` → `up` → `seed all` |
+Lives in `dock_help(topic='debugging')` now, not here — it's maintained alongside the Dock
+MCP itself (`klara-qa-dock/appdata/dock-mcp/help.py`), so it stays current as services and
+gotchas change. Have the subagent call it rather than working from a table that can go
+stale in this file. It covers: lock-file-out-of-sync, migration errors, unhealthy/
+restart-looping containers, dead overmind processes, stale `*-test` containers, missing
+prerequisites, and the rebuild-first heuristic.
 
-> **Match the reload target to the path that failed:** a failure surfaced by `dock_test`
-> lives in the `*-test` container — reload `<service>-test`, not the app container, or the
-> retry hits the same stale build.
+One thing worth restating here because it's easy to get backwards: **match the reload
+target to the path that failed** — a failure surfaced by `dock_test` lives in the
+`*-test` container, so reload `<service>-test`, not the app container, or the retry hits
+the same stale build.
 
 ## Red flags — you are about to violate the rule
 
@@ -111,8 +126,8 @@ Return ONLY this summary (no preamble):
   table above.
 - "The fix was one command, no need to mention it" → **report it anyway** in the
   end-of-task summary. The user must know their environment changed.
-- "I'll seed to be safe" → seeding wipes dev data; only the subagent seeds, only when
-  warranted, and it must flag it.
+- "I'll just tweak this row/config directly instead of reseeding" → that's a hand-patch,
+  not a fix; it disappears on the next rebuild. Use the real fix and flag any data reset.
 - "Job call returned, so it worked" → not until `returncode == 0` and you re-verified.
 
 ## Common mistakes
