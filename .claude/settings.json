@@ -9,7 +9,7 @@
       "Bash(git commit)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "deniedMcpServers": [
     {
       "serverName": "claude_design"
@@ -23,6 +23,45 @@
           {
             "type": "command",
             "command": "bash '/Users/levente.berky/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash '/Users/levente.berky/.claude/hooks/vault-session-start.sh'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/levente.berky/.claude/hooks/vault-event-nudge.sh'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__jira_transition_issue|mcp__atlassian__jira_add_comment",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/levente.berky/.claude/hooks/vault-event-nudge.sh'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/levente.berky/.claude/hooks/vault-stop-check.sh'",
             "timeout": 10
           }
         ]

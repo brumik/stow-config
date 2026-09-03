@@ -23,16 +23,16 @@ once it's inside a quoted subprocess argument.
 
 ## 2. Draft the first message
 
-Don't pull the ticket/PR content — that's the new session's own job (a future context-pulling
-skill it will invoke itself). Just tell it what to work on:
+Don't pull the ticket/PR content — that's the new session's own job (the `vault` skill, which
+it invokes itself). Just tell it what to work on:
 
-> Start working on `<item-key>` (`<link, if any>`). Pull your own context on it first, then
-> proceed.
+> Start working on `<item-key>` (`<link, if any>`). Use the `vault` skill to pull your own
+> context on it first, then proceed.
 
 ## 3. Create the session — fully scripted
 
 ```bash
-bash .claude/skills/start-item/scripts/create-session.sh "<resolved_cwd>" "<item-key>" "<drafted message>"
+bash ~/.claude/skills/start-item/scripts/create-session.sh "<resolved_cwd>" "<item-key>" "<drafted message>"
 ```
 
 Handles workspace creation, agent name sanitization, `agent start` (retries briefly if the pane
