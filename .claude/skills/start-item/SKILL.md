@@ -1,6 +1,6 @@
 ---
 name: start-item
-description: Use when the user asks to start working on a specific item — usually one surfaced by /morning — identified by a Jira key (e.g. KLARA-1234) or a GitHub PR/issue. Opens a new herdr workspace, cds into the relevant repo, launches a claude session there, and seeds it with a first message telling it to pull its own context. Runs in the background; does not change focus.
+description: Use when the user asks to start working on a specific item — usually one surfaced by /morning — identified by a Jira key (e.g. KLARA-1234) or a GitHub PR/issue. Opens a new herdr tab in the current workspace, cds into the relevant repo, launches a claude session there, and seeds it with a first message telling it to pull its own context. Runs in the background; does not change focus.
 ---
 
 # Start item
@@ -60,11 +60,12 @@ a reference, not the target:
 bash ~/.claude/skills/start-item/scripts/create-session.sh "<resolved_cwd>" "<item-key>" "<drafted message>"
 ```
 
-Handles workspace creation, agent name sanitization, `agent start` (retries briefly if the pane
-isn't an available shell yet, starts the new session in `--permission-mode plan` so it can
-explore/pull context without a permission prompt per read), and `agent prompt`. Prints
-`{agent, pane, workspace, cwd}` on success; runs in the background (`--no-focus`, no `--wait`)
-so the current session is untouched.
+Handles tab creation (a new tab in the *current* workspace, not a new workspace — falls back
+to a new workspace only if `$HERDR_WORKSPACE_ID` is unset), agent name sanitization, `agent
+start` (retries briefly if the pane isn't an available shell yet, starts the new session in
+`--permission-mode plan` so it can explore/pull context without a permission prompt per
+read), and `agent prompt`. Prints `{agent, pane, workspace, cwd}` on success; runs in the
+background (`--no-focus`, no `--wait`) so the current session is untouched.
 
 `<item-key>` here is just a short label (sanitized, cut to 32 chars) — for a freeform note,
 don't pass the whole note as this argument, invent a short slug for it instead (e.g.

@@ -28,9 +28,18 @@ case "$agent_name" in
 esac
 agent_name="$(printf '%s' "$agent_name" | cut -c1-32)"
 
-ws_json="$(herdr workspace create --cwd "$cwd" --label "$item_key" --no-focus)"
-pane_id="$(printf '%s' "$ws_json" | jq -r '.result.root_pane.pane_id')"
-workspace_id="$(printf '%s' "$ws_json" | jq -r '.result.workspace.workspace_id')"
+# Prefer a new tab in the current workspace over a whole new workspace — this session's
+# HERDR_WORKSPACE_ID (set by herdr for every session it launches) is that workspace. Only
+# fall back to creating a fresh workspace if that's somehow unset (e.g. run outside herdr).
+if [ -n "${HERDR_WORKSPACE_ID:-}" ]; then
+  tab_json="$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$cwd" --label "$item_key" --no-focus)"
+  pane_id="$(printf '%s' "$tab_json" | jq -r '.result.root_pane.pane_id')"
+  workspace_id="$HERDR_WORKSPACE_ID"
+else
+  ws_json="$(herdr workspace create --cwd "$cwd" --label "$item_key" --no-focus)"
+  pane_id="$(printf '%s' "$ws_json" | jq -r '.result.root_pane.pane_id')"
+  workspace_id="$(printf '%s' "$ws_json" | jq -r '.result.workspace.workspace_id')"
+fi
 
 
 # The pane isn't an "available shell" the instant workspace create returns — the shell
