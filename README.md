@@ -67,6 +67,27 @@ stow -d ~/Documents -t ~ stow-config
    ```
 3. Commit and push.
 
+### Files that are deliberately not symlinked
+
+Not everything here belongs in `$HOME`. Installers, samples, and docs are run
+or copied straight from the checkout, so `.stow-local-ignore` keeps stow's hands
+off them:
+
+| Entry | Why |
+|---|---|
+| `install.sh`, `README.md` | Run and read from the repo. |
+| `atlassian-mcp/` | Its own `install.sh` copies the plist into `~/Library/LaunchAgents`. |
+| `.zprofile.sample` | A template you copy into `~/.zprofile` and fill with secrets. |
+| `docs/` | Design specs. Some are internal and globally gitignored. |
+
+Add anything similar to `.stow-local-ignore` **before** the next `stow` run.
+Because that file exists, it *replaces* stow's built-in default ignore list
+rather than extending it — so VCS and editor-backup patterns are spelled out
+there too. Top-level-only entries are anchored with `^/`.
+
+With that list correct, plain `stow` is a clean no-op on an up-to-date machine
+and never needs individual files linked by hand.
+
 ## herdr
 
 `~/.config/herdr/config.toml` is stow-managed; the rest of `~/.config/herdr`

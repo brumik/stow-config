@@ -1,5 +1,28 @@
+# GNU Stow ignore list for this package.
+#
+# The presence of this file REPLACES stow's built-in default ignore list, so
+# everything that must stay unstowed has to be named here explicitly.
+#
+# Patterns are anchored regexes. One containing "/" matches against the path
+# relative to the package root; one without matches the basename at any depth.
+# "^/foo" therefore means "foo at the top level only".
+
+# --- VCS and OS noise ---
 \.git
 \.gitignore
+\.gitmodules
 \.DS_Store
-install.sh
-README\.md
+
+# --- editor backup / autosave files ---
+.+~
+\#.*\#
+
+# --- run or copied from the checkout, never symlinked into $HOME ---
+# Installers, samples, and docs. You invoke or copy these from the repo; a
+# symlink in ~ would just be a file nothing reads. Keeping them listed is what
+# lets `stow` be run plainly, with no hand-linking of individual files.
+^/install\.sh
+^/README\.md
+^/atlassian-mcp
+^/\.zprofile\.sample
+^/docs
