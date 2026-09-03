@@ -89,6 +89,16 @@ the script from that file:
 bash ~/.claude/skills/morning/scripts/format-jira.sh < /tmp/jira_assigned.json
 ```
 
+**Write the raw tool result verbatim — the `{"result": "<json-string>"}` envelope, not the
+parsed object inside it.** The `jira_search` MCP tool result is an object with one key,
+`result`, whose value is itself a JSON-encoded *string* (you'll see escaped `\"` and `\n`
+inside it). The script's first line is `.result | fromjson` — it does the unwrapping
+itself. A recurring mistake is to "clean up" the tool result first — pulling out just the
+inner `{"total":..., "issues":[...]}` and writing that instead. That breaks `fromjson`
+with `null (null) only strings can be parsed`, because there's no `.result` string to
+parse. Write the tool result byte-for-byte, envelope included, with nothing extracted or
+reformatted.
+
 ## 5. Jira — mentions
 
 ```
