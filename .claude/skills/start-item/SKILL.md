@@ -71,7 +71,26 @@ background (`--no-focus`, no `--wait`) so the current session is untouched.
 don't pass the whole note as this argument, invent a short slug for it instead (e.g.
 `acr-values-2`). The full note text belongs only in the drafted `<message>` argument.
 
-Report that result to the user verbatim-ish (which workspace/label it landed in) — don't
+## 4. Verify delivery before reporting
+
+The script's printed JSON only means the `herdr agent prompt` call didn't error — it does
+not prove the new session actually started processing it. `herdr agent list` status for the
+new pane can also show stale `idle` right after prompting, even once the session is working,
+which reads as "nothing happened." Don't report success off either signal alone.
+
+Confirm the message actually landed by reading the pane's own transcript:
+
+```bash
+herdr agent read "<agent_name>" --source recent --lines 60
+```
+
+Look for the drafted message text followed by the session's own response (a skill
+invocation, a tool call, "Computing…", etc.) — that's proof it's working, not just that the
+prompt call succeeded. Only report success to the user once you see that. If the pane still
+just shows the banner with no response, wait briefly and re-check rather than declaring it
+sent.
+
+Report the result to the user verbatim-ish (which workspace/label it landed in) — don't
 re-derive it.
 
 ## Notes
