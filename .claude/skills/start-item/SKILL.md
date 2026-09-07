@@ -63,9 +63,10 @@ bash ~/.claude/skills/start-item/scripts/create-session.sh "<resolved_cwd>" "<it
 Handles tab creation (a new tab in the *current* workspace, not a new workspace — falls back
 to a new workspace only if `$HERDR_WORKSPACE_ID` is unset), agent name sanitization, `agent
 start` (retries briefly if the pane isn't an available shell yet, starts the new session in
-`--permission-mode plan` so it can explore/pull context without a permission prompt per
-read), and `agent prompt`. Prints `{agent, pane, workspace, cwd}` on success; runs in the
-background (`--no-focus`, no `--wait`) so the current session is untouched.
+`--permission-mode auto` so it explores, pulls context, and proceeds with the work itself
+without a per-step approval gate), and `agent prompt`. Prints `{agent, pane, workspace, cwd}`
+on success; runs in the background (`--no-focus`, no `--wait`) so the current session is
+untouched.
 
 `<item-key>` here is just a short label (sanitized, cut to 32 chars) — for a freeform note,
 don't pass the whole note as this argument, invent a short slug for it instead (e.g.

@@ -5,9 +5,9 @@
 #   item-key  human label, e.g. KLARA-1234 or repo#123 (sanitized into the agent name)
 #   message   first message to send into the new session
 #
-# New sessions start in --permission-mode plan: read-only exploration (the vault pull, repo
-# reads) needs no per-tool approval, and the session naturally pauses for a plan before it
-# can edit or run anything — the user reviews and approves before real work starts.
+# New sessions start in --permission-mode auto: it explores, pulls context, and proceeds
+# with the work itself, only stopping for genuinely blocking decisions — no per-step
+# approval gate before it can edit or run anything.
 set -euo pipefail
 
 cwd="$1"
@@ -45,7 +45,7 @@ fi
 # The pane isn't an "available shell" the instant workspace create returns — the shell
 # process is still spawning. Retry briefly instead of failing on agent_pane_busy.
 for attempt in 1 2 3 4 5; do
-  if herdr agent start "$agent_name" --kind claude --pane "$pane_id" -- --permission-mode plan >/dev/null 2>/tmp/start-item-agent-start.err; then
+  if herdr agent start "$agent_name" --kind claude --pane "$pane_id" -- --permission-mode auto >/dev/null 2>/tmp/start-item-agent-start.err; then
     break
   fi
   if [ "$attempt" = 5 ]; then
