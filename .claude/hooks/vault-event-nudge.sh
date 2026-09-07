@@ -43,6 +43,8 @@ STATE_FILE="$STATE_DIR/$SESSION_ID.json"
 TICKET="$(jq -r '.ticket // empty' "$STATE_FILE" 2>/dev/null)"
 [ -n "$TICKET" ] || exit 0
 
+KIND="$(jq -r '.kind // "ticket"' "$STATE_FILE" 2>/dev/null)"
+
 NOW="$(date +%s 2>/dev/null)"
 [ -n "$NOW" ] || exit 0
 
@@ -62,7 +64,11 @@ if [ "$DIRTY_AT" -eq 0 ]; then
   fi
 fi
 
-NOTE="$VAULT/tickets/$TICKET.md"
+if [ "$KIND" = "task" ]; then
+  NOTE="$VAULT/tasks/$TICKET.md"
+else
+  NOTE="$VAULT/tickets/$TICKET.md"
+fi
 
 jq -n --arg note "$NOTE" \
   '{hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:("Vault: that looked like a decision point. Consider appending a dated entry to " + $note + " (vault skill, `log` procedure) — Decisions must name the rejected alternative.")}}' \

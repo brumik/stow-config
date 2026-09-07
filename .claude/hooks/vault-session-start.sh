@@ -26,7 +26,7 @@ find "$STATE_DIR" -maxdepth 1 -type f -name '*.json' -mtime "+$PRUNE_DAYS" -dele
 [ -d "$VAULT" ] || exit 0
 
 cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"Klara vault is available at $VAULT. If this session concerns a ticket, invoke the \`vault\` skill and run its \`pull\` procedure before working."}}
+{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"Klara vault is available at $VAULT. If this session concerns a ticket or an ad-hoc task, invoke the \`vault\` skill and run its \`pull\` procedure before working."}}
 EOF
 
 exit 0

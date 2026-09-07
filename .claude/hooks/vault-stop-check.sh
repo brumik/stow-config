@@ -44,7 +44,12 @@ STATE_FILE="$STATE_DIR/$SESSION_ID.json"
 TICKET="$(jq -r '.ticket // empty' "$STATE_FILE" 2>/dev/null)"
 [ -n "$TICKET" ] || exit 0
 
-NOTE="$VAULT/tickets/$TICKET.md"
+KIND="$(jq -r '.kind // "ticket"' "$STATE_FILE" 2>/dev/null)"
+if [ "$KIND" = "task" ]; then
+  NOTE="$VAULT/tasks/$TICKET.md"
+else
+  NOTE="$VAULT/tickets/$TICKET.md"
+fi
 
 # 2. Kill switches (part two: per-ticket `nag: off` in the frontmatter).
 # Only the leading frontmatter block is inspected, and only the value — the
