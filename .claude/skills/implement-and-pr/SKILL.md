@@ -12,19 +12,25 @@ End-to-end workflow for turning an approved plan into a draft PR, without skippi
 gate or accidentally publishing more than a draft. Use it when the user hands you an
 implementation task and wants the full loop: plan → approval → code → tests → draft PR link.
 
-## 1. Plan first — don't skip straight to code
+## 1. Confirm the base branch and pull latest
+
+Before planning or touching any files, confirm what the repo's actual main/trunk branch is
+called — it's often not literally `main` (e.g. `rc`) — and pull it. Planning or branching off
+a stale or wrong base wastes the rest of the workflow.
+
+## 2. Plan first — don't skip straight to code
 
 Enter plan mode (`EnterPlanMode`) and explore/design there, even if the change feels
 straightforward. This is the gate that prevents wasted implementation work on a plan the user
 would have redirected.
 
-## 2. Get explicit approval — non-negotiable
+## 3. Get explicit approval — non-negotiable
 
 Call `ExitPlanMode` and wait for the user's approval. Do **not** start editing, running
 non-readonly commands, or making any change before it comes back approved. If the user asks for
 changes, revise and exit plan mode again — don't treat a first pass as good enough.
 
-## 3. The approved plan is already written down
+## 4. The approved plan is already written down
 
 Plan mode writes the final plan to `~/.claude/plans/<slug>.md` as part of exiting — that file is
 the durable record; you don't need to re-save it elsewhere.
@@ -33,7 +39,7 @@ If the session has accumulated a lot of exploration context and you expect a lon
 + test + PR tail, consider `/compact` now — the plan file survives compaction, so nothing is
 lost, and the rest of the workflow runs cheaper.
 
-## 4. Implement, test, branch/commit/draft PR — all inline
+## 5. Implement, test, branch/commit/draft PR — all inline
 
 No subagent dispatch in this step. Follow the approved plan; don't improvise scope beyond it
 without going back for approval.
@@ -54,7 +60,7 @@ Once tests pass:
   to ready-for-review or ping reviewers; that's a separate, user-prompted step (see
   `review-ready-pr` for formatting it when the user asks to make it review-ready).
 
-## 5. Report back
+## 6. Report back
 
 The result is the draft PR link — hand it back to the user as the final output of this workflow,
 plus a note of any environment fixes `repairing-dock-environment` made along the way (it already

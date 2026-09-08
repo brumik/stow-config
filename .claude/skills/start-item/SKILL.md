@@ -40,11 +40,20 @@ once it's inside a quoted subprocess argument.
 
 ## 2. Draft the first message
 
+Every drafted message — clean reference or freeform note — must also tell the new session to
+use the `implement-and-pr` skill for the implementation itself, if the task turns out to be
+implementation work. Naming the skill explicitly matters — left to its own judgment, the new
+session frequently skips straight to editing without it. (`implement-and-pr` itself now
+handles confirming the repo's real main/trunk branch and pulling latest before it plans or
+touches anything, so this message doesn't need to repeat that.)
+
 For a **clean reference**: don't pull the ticket/PR content — that's the new session's own
 job (the `vault` skill, which it invokes itself). Just tell it what to work on:
 
 > Start working on `<item-key>` (`<link, if any>`). Use the `vault` skill to pull your own
-> context on it first, then proceed.
+> context on it first, then proceed. If this turns out to be implementation work, use the
+> `implement-and-pr` skill to run the plan → approval → implement → PR loop rather than
+> editing directly.
 
 For a **freeform note**: the note *is* the context — there's no vault entry to pull it back
 from, so losing it here loses it for good. Quote it in full, then add any key it mentioned as
@@ -52,7 +61,9 @@ a reference, not the target:
 
 > Start working on this: `<full original note text, verbatim>`. Note: `<key>` mentioned in it
 > is a reference/epic, not necessarily the item itself — still use the `vault` skill to pull
-> context on it, but the task is what the note above says.
+> context on it, but the task is what the note above says. If this turns out to be implementation
+> work, use the `implement-and-pr` skill to run the plan → approval → implement → PR loop
+> rather than editing directly.
 
 ## 3. Create the session — fully scripted
 
