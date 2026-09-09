@@ -33,6 +33,11 @@ no notification will ever surface them.
   can't interpret still gets printed — you are not the judge of what the user meant.
 - **Read-only here.** Do not write to the pad, tick anything off, or offer to drain it.
   Draining is `hygiene.md`, and only when the user asks for it by name.
+- **Stays put — never re-homed into a scripted section.** A pad line can mention a PR or a
+  ticket key, but sections 2–5 must reflect *only* what their own script/JQL returned. If a
+  script says `NONE`, that section is `NONE`, even if the pad happens to mention something
+  that looks related. Don't lift a pad item into another section just because it looks like
+  it belongs there — that's duplication, not synthesis.
 
 ## 2. GitHub — actionable, personal only
 
@@ -119,6 +124,9 @@ Blocked on You / Jira: Assigned / Jira: Mentions). Omit a section entirely when 
 
 **Number every item with one running sequence across the whole message** — item 1 is the
 first bullet of the first non-empty section, and numbering keeps climbing across section
-boundaries without resetting. This is so the user can point at anything ("start 3", "move 5
-to code review") by number alone instead of repeating text back. Don't number section
-headers, only the individual bullets underneath them.
+boundaries without resetting. This includes the Scratchpad section — it is not exempt just
+because it's freeform; every leaf bullet in it gets the next number in sequence too. This is
+so the user can point at anything ("start 3", "move 5 to code review") by number alone
+instead of repeating text back. Don't number section headers or pad sub-headings/lead-in
+lines (e.g. a label introducing a nested list) — only the individual leaf bullets underneath
+them.
